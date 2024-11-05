@@ -27,8 +27,7 @@ CREATE TABLE KHACHHANG
 (
     MAKHACHHANG CHAR(9) PRIMARY KEY,
     TENCONGTY NVARCHAR(50) null,
-    TENGIAODICH NVARCHAR(50) null,
-	DIACHI NVARCHAR(50),
+    TENGIAODICH NVARCHAR(50) null ,
     EMAIL VARCHAR(50) not null,
     DIENTHOAI VARCHAR(11) not null,
     FAX VARCHAR(20) null
@@ -38,14 +37,14 @@ CREATE TABLE KHACHHANG
 CREATE TABLE QuocGia
 (
     maQG CHAR(10) PRIMARY KEY,
-    tenQG NVARCHAR(50) not null
+    tenQG NVARCHAR(100) not null
 );
 
 -- Tạo bảng TinhTP
 CREATE TABLE TinhTP
 (
     maTP CHAR(10) PRIMARY KEY,
-    tenTP NVARCHAR(50) not null ,
+    tenTP NVARCHAR(100) not null ,
     maQG CHAR(10) null,
     CONSTRAINT fk_TinhTP_QuocGia FOREIGN KEY (maQG) REFERENCES QuocGia(maQG) ON UPDATE CASCADE ON DELETE CASCADE
 );
@@ -54,7 +53,7 @@ CREATE TABLE TinhTP
 CREATE TABLE QuanHuyen
 (
     maQH CHAR(10) PRIMARY KEY,
-    tenQH NVARCHAR(50) not null ,
+    tenQH NVARCHAR(100) not null ,
     maTP CHAR(10) not null,
     CONSTRAINT fk_QuanHuyen_TinhTP FOREIGN KEY (maTP) REFERENCES TinhTP(maTP) ON UPDATE CASCADE ON DELETE CASCADE
 );
@@ -63,14 +62,10 @@ CREATE TABLE QuanHuyen
 CREATE TABLE PhuongXa
 (
     maPX CHAR(10) PRIMARY KEY,
-    tenPX NVARCHAR(50) not null,
+    tenPX NVARCHAR(100) not null,
     maQH CHAR(10) not null,
     CONSTRAINT fk_PhuongXa_QuanHuyen FOREIGN KEY (maQH) REFERENCES QuanHuyen(maQH) ON UPDATE CASCADE ON DELETE CASCADE
 );
-
---xóa cột địa chỉ
-ALTER TABLE KHACHHANG
-	DROP COLUMN DIACHI;
 
 -- Thêm cột maPX và soNhaTenDuong vào bảng KHACHHANG
 ALTER TABLE KHACHHANG
@@ -234,12 +229,10 @@ CREATE TABLE CHITIETDATHANG
     CONSTRAINT fk_CHITIETDATHANG_MATHANG FOREIGN KEY (MAHANG) REFERENCES MATHANG(MAHANG) ON UPDATE no action  ON DELETE no action
 );
 
----------------------------------------------------------------------------------------------------------------------------------------------------------------	
 -- Tạo thông tin trong bảng QuocGia
 INSERT INTO QuocGia
 VALUES 
 		('QG00000001', N'Việt Nam');
-
 -- Tạo thông tin trong bảng TinhTP
 INSERT INTO TinhTP
 VALUES 
@@ -248,7 +241,6 @@ VALUES
 		('T000000003', N'Ninh Bình',null),
 		('T000000004', N'Quảng Trị',null),
 		('T000000005', N'TP Hồ Chí Minh',null);
-
 -- Tạo thông tin trong bảng QuanHuyen
 INSERT INTO QuanHuyen
 VALUES 
@@ -265,7 +257,6 @@ VALUES
 		('PX00000003', N'Đông Hải','QH00000003'),
 		('PX00000004', N'Bắc Sơn','QH00000004'),
 		('PX00000005', N'Phường 1','QH00000005');
-
 -- Tạo thông tin trong bảng KHACHHANG
 set dateformat dmy
 insert into KHACHHANG
@@ -275,7 +266,6 @@ values
 		('KH0000003','Routine','GD003','Routine@gmail.com','0909090907','fax003','PX00000003',N'100 Điện Biên Phủ'),
 		('KH0000004','Coolmate','GD004','Coolmate@gmail.com','0909090906','fax004','PX00000004',N'26 Quang Trung'),
 		('KH0000005','Yody','GD005','Yody@gmail.com','0909090905','fax005','PX00000005',N'12 Nguyễn Tất Thành');
-
 -- Tạo thông tin trong bảng NHANVIEN
 set dateformat dmy
 insert into NHANVIEN
@@ -285,7 +275,6 @@ values
 		('NV0000003',N'Nguyễn',N'Khánh Linh','26-10-2005',getdate(),'0101013101','khanhlinh@gmail.com','fax008',5000000,2000000,'PX00000003',N'12 Ông Ích Khiêm'),
 		('NV0000004',N'Phạm',N'Huy Hoàng','25-10-2005',getdate(),'0101010104','huyhoang@gmail.com','fax009',5000000,2000000,'PX00000004',N'23 Nguyễn Tất Thành'),
 		('NV0000005',N'Đinh',N'Tiên Hoàng','24-10-2005',getdate(),'0101010181','tienhoang@gmail.com','fax010',5000000,2000000,'PX00000005',N'01 Lê Lợi');
-
 -- Tạo thông tin trong bảng LOAIHANG
 insert into LOAIHANG
 values 
@@ -294,17 +283,15 @@ values
 		('LH003',N'Túi xách'),
 		('LH004',N'Khăn'),
 		('LH005',N'Giày');
-
 -- Tạo thông tin trong bảng DONDATHANG
 set dateformat dmy
 insert into DONDATHANG
 values 
-		('HD0000001','KH0000001','NV0000001',getdate(),getdate()+1,getdate()+4,'PX00000001',N'15 Lý Thường Kiệt'),
-		('HD0000002','KH0000001','NV0000002',getdate(),getdate()+2,getdate()+4,'PX00000002',N'22 Nguyễn Tất Thành'),
-		('HD0000003','KH0000003','NV0000001',getdate(),getdate(),getdate()+4,'PX00000001',N'12 Lý Thường Kiệt'),
-		('HD0000004','KH0000004','NV0000004',getdate(),getdate(),getdate()+4,'PX00000004',N'26 Quang Trung'),
-		('HD0000005','KH0000005','NV0000005',getdate(),getdate()+1,getdate()+4,'PX00000003',N'66 Điện Biên Phủ');
-
+		('HD0000001','KH0000001','NV0000001',null,getdate()+1,getdate()+4,'PX00000001',N'15 Lý Thường Kiệt'),
+		('HD0000002','KH0000001','NV0000002',null,getdate()+2,getdate()+4,'PX00000002',N'22 Nguyễn Tất Thành'),
+		('HD0000003','KH0000003','NV0000001',null,getdate(),getdate()+4,'PX00000001',N'12 Lý Thường Kiệt'),
+		('HD0000004','KH0000004','NV0000004',null,getdate(),getdate()+4,'PX00000004',N'26 Quang Trung'),
+		('HD0000005','KH0000005','NV0000005',null,getdate()+1,getdate()+4,'PX00000003',N'66 Điện Biên Phủ');
 -- Tạo thông tin trong bảng NHACUNGCAP
 INSERT INTO NHACUNGCAP
 VALUES
@@ -313,7 +300,6 @@ VALUES
 		('CT00000002',N'Công ty B','GD003','0121456789',null,'Gristino@gmail.com','PX00000002', N'15 Lý Thường Kiệt'),
 		('CT00000003',N'Công ty C','GD004','0123156789',null,'Dristino@gmail.com','PX00000003', N'26 Quang Trung'),
 		('CT00000004',N'Công ty D','GD005','0123416789',null,'Eristino@gmail.com','PX00000004', N'66 Điện Biên Phủ');
-
 -- Tạo thông tin trong bảng MATHANG
 insert into MATHANG
 values 
@@ -322,7 +308,6 @@ values
 		('MH003',N'Quần jeans','CT00000002','LH001',60,null,4800000),--80k/cái
 		('MH004',N'Giày thể thao','CT00000003','LH005',20,null,3000000),--150k/cái
 		('MH005',N'Quần đùi','CT00000003','LH001',30,null,1200000);--40k/cái
-
 -- Tạo thông tin trong bảng CHITIETDATHANG
 insert into CHITIETDATHANG
 values 
@@ -331,84 +316,66 @@ values
 		('HD0000003','MH002',450000,9,null),
 		('HD0000004','MH004',300000,2,10000),
 		('HD0000005','MH005',40000,1,10000);
-
----------------------------------------------------------------------------------------------------------------------------------------------------------------		
 --a) Cập nhật lại giá trị trường NGAYCHUYENHANG của những bản ghi 
 --có NGAYCHUYENHANG chưa xác định (NULL) trong bảng DONDATHANG bằng với giá trị của trường NGAYDATHANG.
 update DONDATHANG
 	set NGAYCHUYENHANG = NGAYDATHANG
 	where NGAYCHUYENHANG = NULL
-
---b) Tăng số lượng hàng của những mặt hàng do công ty Aristino cung cấp lên gấp đôi.
+--b) Tăng số lượng hàng của những mặt hàng do công ty VINAMILK cung cấp lên gấp đôi.
 update MATHANG
 	set SOLUONG = SOLUONG*2
 	from NHACUNGCAP
 	where NHACUNGCAP.MACONGTY = MATHANG.MACONGTY
-		and TENCONGTY = N'Aristino'
-
---c) Cập nhật giá trị của trường soNhaTenDuong trong bảng DONDATHANG bằng địa chỉ của 
---khách hàng đối với những đơn đặt hàng chưa xác định được nơi giao hàng (giá trị trường soNhaTenDuong bằng NULL).
-UPDATE DONDATHANG
-SET soNhaTenDuong = (
-    SELECT soNhaTenDuong 
-    FROM KHACHHANG 
-    WHERE KHACHHANG.MAKHACHHANG = DONDATHANG.MAKHACHHANG
-)
-WHERE EXISTS (
-    SELECT 1 
-    FROM KHACHHANG 
-    WHERE KHACHHANG.MAKHACHHANG = DONDATHANG.MAKHACHHANG 
-    AND soNhaTenDuong IS NOT NULL
-);
-
+		and TENCONGTY = 'VINAMILK'
+--c) Cập nhật giá trị của trường NOIGIAOHANG trong bảng DONDATHANG bằng địa chỉ của 
+--khách hàng đối với những đơn đặt hàng chưa xác định được nơi giao hàng (giá trị trường NOIGIAOHANG bằng NULL).
+update DONDATHANG
+	set DONDATHANG.maPX = KHACHHANG.maPX
+	from KHACHHANG
+	where 
+		DONDATHANG.MAKHACHHANG = KHACHHANG.MAKHACHHANG and
+		DONDATHANG.maPX = NULL
 --d) Cập nhật lại dữ liệu trong bảng KHACHHANG sao cho nếu tên công ty và tên giao dịch của 
 --khách hàng trùng với tên công ty và tên giao dịch của một nhà cung cấp nào đó thì 
 --địa chỉ, điện thoại, fax và e-mail phải giống nhau.
 UPDATE KHACHHANG
 SET 
-    soNhaTenDuong = (SELECT soNhaTenDuong FROM NHACUNGCAP WHERE KHACHHANG.TENCONGTY = NHACUNGCAP.TENCONGTY AND KHACHHANG.TENGIAODICH = NHACUNGCAP.TENCONGTY),
-    DIENTHOAI = (SELECT DIENTHOAI FROM NHACUNGCAP WHERE KHACHHANG.TENCONGTY = NHACUNGCAP.TENCONGTY AND KHACHHANG.TENGIAODICH = NHACUNGCAP.TENCONGTY),
-    FAX = (SELECT FAX FROM NHACUNGCAP WHERE KHACHHANG.TENCONGTY = NHACUNGCAP.TENCONGTY AND KHACHHANG.TENGIAODICH = NHACUNGCAP.TENCONGTY),
-    EMAIL = (SELECT EMAIL FROM NHACUNGCAP WHERE KHACHHANG.TENCONGTY = NHACUNGCAP.TENCONGTY AND KHACHHANG.TENGIAODICH = NHACUNGCAP.TENCONGTY)
-WHERE EXISTS (
-    SELECT 1 
-    FROM NHACUNGCAP 
-    WHERE KHACHHANG.TENCONGTY = NHACUNGCAP.TENCONGTY 
-    AND KHACHHANG.TENGIAODICH = NHACUNGCAP.TENCONGTY
-);
-
---e) Tăng lương lên gấp rưỡi cho những nhân viên bán được số lượng hàng nhiều hơn 8 trong năm 2024.
-UPDATE NHANVIEN
-SET LUONGCOBAN = LUONGCOBAN * 1.5
-WHERE MANHANVIEN IN (
-    SELECT NHANVIEN.MANHANVIEN
-    FROM NHANVIEN, DONDATHANG AS d, CHITIETDATHANG AS c
-    WHERE NHANVIEN.MANHANVIEN = d.MANHANVIEN
-    AND d.SOHOADON = c.SOHOADON
-    AND YEAR(d.NGAYDATHANG) = 2024
-    GROUP BY NHANVIEN.MANHANVIEN
-    HAVING SUM(c.SOLUONG) > 8
-);
-
+    KHACHHANG.maPX = NHACUNGCAP.maPX,
+    KHACHHANG.DIENTHOAI = NHACUNGCAP.DIENTHOAI,
+    KHACHHANG.FAX = NHACUNGCAP.FAX,
+    KHACHHANG.EMAIL = NHACUNGCAP.EMAIL
+FROM KHACHHANG
+JOIN PhuongXa ON KHACHHANG.maPX = PhuongXa.maPX
+JOIN NHACUNGCAP ON PhuongXa.maPX = NHACUNGCAP.maPX
+WHERE 
+    KHACHHANG.TENCONGTY = NHACUNGCAP.TENCONGTY AND
+    KHACHHANG.TENGIAODICH = NHACUNGCAP.TENGIAODICH;
+--e) Tăng lương lên gấp rưỡi cho những nhân viên bán được số lượng hàng nhiều hơn 100 trong năm 2022.
+update NHANVIEN
+	set LUONGCOBAN = LUONGCOBAN *1.5
+	where MANHANVIEN in (
+		select NHANVIEN.MANHANVIEN
+		from NHANVIEN
+		join DONDATHANG on NHANVIEN.MANHANVIEN = DONDATHANG.MANHANVIEN
+		join CHITIETDATHANG on CHITIETDATHANG.SOHOADON = DONDATHANG.SOHOADON
+		group by NHANVIEN.MANHANVIEN
+		having SUM(SOLUONG) > 100
+	)
 --f) Tăng phụ cấp lên bằng 50% lương cho những nhân viên bán được hàng nhiều nhất.
-UPDATE NHANVIEN
-SET PHUCAP = LUONGCOBAN * 0.5
-WHERE MANHANVIEN = (
-    SELECT TOP 1 MANHANVIEN
-    FROM (
-        SELECT MANHANVIEN, SUM(SOLUONG) AS TotalSales
-        FROM DONDATHANG DDH, CHITIETDATHANG CTDH
-        WHERE DDH.SOHOADON = CTDH.SOHOADON
-        GROUP BY MANHANVIEN
-    ) AS Sales
-    ORDER BY TotalSales DESC
-);
-
---g) Giảm 25% lương của những nhân viên trong năm 2024 không lập được bất kỳ đơn đặt hàng nào.
-UPDATE NHANVIEN
-SET LUONGCOBAN = LUONGCOBAN * 0.75
-WHERE MANHANVIEN NOT IN (
-    SELECT MANHANVIEN
-    FROM DONDATHANG
-    WHERE YEAR(NGAYDATHANG) = 2024
-);
+update NHANVIEN
+	set PHUCAP = LUONGCOBAN/2
+	where MANHANVIEN in (
+		select top 1 with ties NHANVIEN.MANHANVIEN
+		from NHANVIEN
+		join DONDATHANG on NHANVIEN.MANHANVIEN = DONDATHANG.MANHANVIEN
+		join CHITIETDATHANG on CHITIETDATHANG.SOHOADON = DONDATHANG.SOHOADON
+		group by NHANVIEN.MANHANVIEN
+		order by SUM(SOLUONG) desc
+	)
+--g) Giảm 25% lương của những nhân viên trong năm 2023 không lập được bất kỳ đơn đặt hàng nào.
+update NHANVIEN
+	set LUONGCOBAN = LUONGCOBAN*(75/100)
+	where MANHANVIEN not in (
+		select MANHANVIEN
+		from DONDATHANG
+	)
