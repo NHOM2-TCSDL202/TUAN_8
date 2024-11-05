@@ -299,8 +299,8 @@ values
 set dateformat dmy
 insert into DONDATHANG
 values 
-		('HD0000001','KH0000001','NV0000001',getdate(),getdate()+1,getdate()+4,'PX00000001',N'15 Lý Thường Kiệt'),
-		('HD0000002','KH0000001','NV0000002',getdate(),getdate()+2,getdate()+4,'PX00000002',N'22 Nguyễn Tất Thành'),
+		('HD0000001','KH0000001','NV0000001',getdate(),getdate()+1,getdate()+4,'PX00000001',NULL),
+		('HD0000002','KH0000001','NV0000002',getdate(),getdate()+2,getdate()+4,'PX00000002',NULL),
 		('HD0000003','KH0000003','NV0000001',getdate(),getdate(),getdate()+4,'PX00000001',N'12 Lý Thường Kiệt'),
 		('HD0000004','KH0000004','NV0000004',getdate(),getdate(),getdate()+4,'PX00000004',N'26 Quang Trung'),
 		('HD0000005','KH0000005','NV0000005',getdate(),getdate()+1,getdate()+4,'PX00000003',N'66 Điện Biên Phủ');
@@ -345,65 +345,54 @@ update MATHANG
 	from NHACUNGCAP
 	where NHACUNGCAP.MACONGTY = MATHANG.MACONGTY
 		and TENCONGTY = N'Aristino'
-
 --c) Cập nhật giá trị của trường soNhaTenDuong trong bảng DONDATHANG bằng địa chỉ của 
 --khách hàng đối với những đơn đặt hàng chưa xác định được nơi giao hàng (giá trị trường soNhaTenDuong bằng NULL).
 UPDATE DONDATHANG
-SET soNhaTenDuong = (
-    SELECT soNhaTenDuong 
-    FROM KHACHHANG 
-    WHERE KHACHHANG.MAKHACHHANG = DONDATHANG.MAKHACHHANG
-)
-WHERE EXISTS (
-    SELECT 1 
-    FROM KHACHHANG 
-    WHERE KHACHHANG.MAKHACHHANG = DONDATHANG.MAKHACHHANG 
-    AND soNhaTenDuong IS NOT NULL
-);
-
+set DONDATHANG.soNhaTenDuong = KHACHHANG.soNhaTenDuong
+from KHACHHANG
+where 
+	KHACHHANG.MAKHACHHANG = DONDATHANG.MAKHACHHANG and
+	DONDATHANG.soNhaTenDuong is NULL
 --d) Cập nhật lại dữ liệu trong bảng KHACHHANG sao cho nếu tên công ty và tên giao dịch của 
 --khách hàng trùng với tên công ty và tên giao dịch của một nhà cung cấp nào đó thì 
 --địa chỉ, điện thoại, fax và e-mail phải giống nhau.
 UPDATE KHACHHANG
 SET 
-    soNhaTenDuong = (SELECT soNhaTenDuong FROM NHACUNGCAP WHERE KHACHHANG.TENCONGTY = NHACUNGCAP.TENCONGTY AND KHACHHANG.TENGIAODICH = NHACUNGCAP.TENCONGTY),
-    DIENTHOAI = (SELECT DIENTHOAI FROM NHACUNGCAP WHERE KHACHHANG.TENCONGTY = NHACUNGCAP.TENCONGTY AND KHACHHANG.TENGIAODICH = NHACUNGCAP.TENCONGTY),
-    FAX = (SELECT FAX FROM NHACUNGCAP WHERE KHACHHANG.TENCONGTY = NHACUNGCAP.TENCONGTY AND KHACHHANG.TENGIAODICH = NHACUNGCAP.TENCONGTY),
-    EMAIL = (SELECT EMAIL FROM NHACUNGCAP WHERE KHACHHANG.TENCONGTY = NHACUNGCAP.TENCONGTY AND KHACHHANG.TENGIAODICH = NHACUNGCAP.TENCONGTY)
-WHERE EXISTS (
-    SELECT 1 
-    FROM NHACUNGCAP 
-    WHERE KHACHHANG.TENCONGTY = NHACUNGCAP.TENCONGTY 
-    AND KHACHHANG.TENGIAODICH = NHACUNGCAP.TENCONGTY
-);
-
+    KHACHHANG.DIENTHOAI = NHACUNGCAP.DIENTHOAI,
+    KHACHHANG.FAX = NHACUNGCAP.FAX,
+    KHACHHANG.EMAIL = NHACUNGCAP.EMAIL,
+    KHACHHANG.maPX = NHACUNGCAP.maPX,
+	KHACHHANG.soNhaTenDuong = NHACUNGCAP.soNhaTenDuong
+FROM 
+    KHACHHANG, NHACUNGCAP
+WHERE 
+    KHACHHANG.TENCONGTY = NHACUNGCAP.TENCONGTY AND
+    KHACHHANG.TENGIAODICH = NHACUNGCAP.TENGIAODICH;
 --e) Tăng lương lên gấp rưỡi cho những nhân viên bán được số lượng hàng nhiều hơn 8 trong năm 2024.
-UPDATE NHANVIEN
-SET LUONGCOBAN = LUONGCOBAN * 1.5
-WHERE MANHANVIEN IN (
-    SELECT NHANVIEN.MANHANVIEN
-    FROM NHANVIEN, DONDATHANG AS d, CHITIETDATHANG AS c
-    WHERE NHANVIEN.MANHANVIEN = d.MANHANVIEN
-    AND d.SOHOADON = c.SOHOADON
-    AND YEAR(d.NGAYDATHANG) = 2024
-    GROUP BY NHANVIEN.MANHANVIEN
-    HAVING SUM(c.SOLUONG) > 8
-);
-
+update NHANVIEN
+	set LUONGCOBAN = LUONGCOBAN *1.5
+	where MANHANVIEN in (
+		select n.MANHANVIEN
+		from NHANVIEN n , DONDATHANG d, CHITIETDATHANG c
+		where
+			n.MANHANVIEN = d.MANHANVIEN and
+			d.SOHOADON = c.SOHOADON and
+			year(NGAYDATHANG) = '2024'
+		group by n.MANHANVIEN
+		having SUM(SOLUONG) > 8
+	)
 --f) Tăng phụ cấp lên bằng 50% lương cho những nhân viên bán được hàng nhiều nhất.
-UPDATE NHANVIEN
-SET PHUCAP = LUONGCOBAN * 0.5
-WHERE MANHANVIEN = (
-    SELECT TOP 1 MANHANVIEN
-    FROM (
-        SELECT MANHANVIEN, SUM(SOLUONG) AS TotalSales
-        FROM DONDATHANG DDH, CHITIETDATHANG CTDH
-        WHERE DDH.SOHOADON = CTDH.SOHOADON
-        GROUP BY MANHANVIEN
-    ) AS Sales
-    ORDER BY TotalSales DESC
-);
-
+update NHANVIEN
+	set PHUCAP = LUONGCOBAN/2
+	where MANHANVIEN in (
+		select top 1 with ties n.MANHANVIEN
+		from NHANVIEN n, DONDATHANG d, CHITIETDATHANG c
+		where 
+			n.MANHANVIEN = d.MANHANVIEN and
+			d.SOHOADON = c.SOHOADON
+		group by n.MANHANVIEN
+		order by SUM(SOLUONG) desc
+	)
 --g) Giảm 25% lương của những nhân viên trong năm 2024 không lập được bất kỳ đơn đặt hàng nào.
 UPDATE NHANVIEN
 SET LUONGCOBAN = LUONGCOBAN * 0.75
